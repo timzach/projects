@@ -18,5 +18,4 @@ node_modules/
 .vscode/
 
 src/*
-!src/video_input/
-!src/video_output/
+
