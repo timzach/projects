@@ -35,6 +35,9 @@ def verbing(s):
 # So 'This dinner is not that bad!' yields:
 # This dinner is good!
 def not_bad(s):
+  return s.replace()
+
+
   # +++your code here+++
   return
 

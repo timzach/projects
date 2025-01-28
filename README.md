@@ -7,6 +7,7 @@ This repository contains my programming projects, organized by language:
 - **C++**: Algorithms and system-level programming.
 - **Misc**: Various projects.
 
+- `src` contains the data for different projects
 ## Usage
 ```powershell
 git clone https://github.com/timzach/projects.git
