@@ -11,7 +11,7 @@ CURRENT_YEAR = datetime.now().year
 POSSIBLE_YEARS = {str(year) for year in range(CURRENT_YEAR - 50, CURRENT_YEAR + 1)}
 
 # Define file categories
-IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.HEIC'}
+IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.heic'}
 VIDEO_EXTENSIONS = {'.mp4', '.mkv', '.mov', '.avi', '.flv', '.wmv'}
 
 
@@ -52,7 +52,7 @@ def determine_date(file_path):
         print(f"🟡 Last Modified Date: {mod_time}")
 
         # If creation date is before modification date, use it normally
-        if creation_time <= mod_time:
+        if creation_time.year <= mod_time.year:
             return creation_time
 
         print("⚠️ Possible copied file detected! Checking for year in filename...")
@@ -65,10 +65,11 @@ def determine_date(file_path):
         if matches:
             # Loop through each found year
             for found_year in matches:
-                if found_year in POSSIBLE_YEARS:
-                    user_input = input(f"🔍 Found year '{found_year}' in filename: '{file_name}'. Use this as creation year? (y/n): ")
-                    if user_input.lower() == 'y':
-                        return datetime(int(found_year), 1, 1)  # Assume Jan 1st of that year
+                if int(found_year) != mod_time.year:
+                    if found_year in POSSIBLE_YEARS:
+                        user_input = input(f"🔍 Found year '{found_year}' in filename: '{file_name}'. Use this as creation year? (y/n): ")
+                        if user_input.lower() == 'y':
+                            return datetime(int(found_year), 1, 1)  # Assume Jan 1st of that year
 
         # If no valid year is found in the name or user didn't select a year
         print("❌ No valid year found or user skipped. 🔄 Using last modified date.")
@@ -116,6 +117,7 @@ def check_and_rename_directory(directory_path):
 
 def sort_files_by_year(directory, destination_dir):
     """Sorts files into year-based subfolders with categories for images, videos, and files."""
+    print(f"Sorting started for Folder {directory}")
     for root, _, files in os.walk(directory):
         for file_name in files:
             file_path = os.path.join(root, file_name)
@@ -152,13 +154,47 @@ def sort_files_by_year(directory, destination_dir):
             print(f"✅ Moved: {file_path} -> {destination_path}")
 
 
+def delete_empty_folders(directory):
+    """
+    Recursively deletes all completely empty folders in the given directory.
+    Runs multiple passes to ensure nested empty folders are also removed.
+    """
+    if not os.path.isdir(directory):
+        print(f"The provided path is not a directory: {directory}")
+        return
+
+    def remove_empty_dirs(path):
+        """Removes all empty directories in the given path, returns True if any folder was deleted."""
+        removed = False
+        for root, dirs, files in os.walk(path, topdown=False):  # Bottom-up traversal
+            for d in dirs:
+                dir_path = os.path.join(root, d)
+                if not os.listdir(dir_path):  # Check if folder is empty
+                    os.rmdir(dir_path)
+                    removed = True
+                    print(f"Deleted empty folder: {dir_path}")
+        return removed
+
+    # Keep running the cleanup until no more empty folders are found
+    while remove_empty_dirs(directory):
+        pass  # Keep looping until no more empty directories remain
+
+    # Finally, check if the root directory itself is empty
+    if not os.listdir(directory):
+        print(f"The root directory is now empty: {directory}")
+
 
 # 🔹 Change these paths before running
 #source_folder = r"C:\Users\tim\Desktop\AUS Job"
 #destination_folder = r"C:\Users\tim\Desktop\Sorted"
+destination_folder = r"D:\Sorted"
+source_folder_location = r"C:\Users\tim"
+source_folders = ['OneDrive']
 
-destination_folder = r"C:\Users\tim\Desktop\AUS Job"
-source_folder = r"C:\Users\tim\Desktop\Sorted"
+for folder in source_folders:
+    #print(os.path.join(source_folder_location, folder))
+    sort_files_by_year(os.path.join(source_folder_location,folder),destination_folder)
+    delete_empty_folders(os.path.join(source_folder_location,folder))
+#sort_files_by_year(source_folder, destination_folder)
 
-
-sort_files_by_year(source_folder, destination_folder)
+#delete_empty_folders(r"C:\Users\tim\OneDrive\Dokumente")
