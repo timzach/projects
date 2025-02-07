@@ -127,9 +127,9 @@ def delete_empty_folders(directory):
 
 
 # Change these paths before running
-source_folder_location = r"D:\\"
+source_folder_location = r"C:\Users\tim\OneDrive_download\Bilder\Katzen"
 destination_folder = r"D:\Sorted"
-source_folders = ['Not_Sorted']
+source_folders = ['iCloud Fotos']
 
 
 if __name__ == "__main__":
